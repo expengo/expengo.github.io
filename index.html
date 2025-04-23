@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EnpenGO - Gestor de Gastos</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap">
+    <style>
+        :root {
+            /* Paleta de colores principal */
+            --primary-color: #FF0000;
+            --primary-light: #ff3333;
+            --primary-dark: #cc0000;
+            --income-color: #10b981;
+            --income-light: #34d399;
+            --expense-color: #ef4444;
+            --expense-light: #f87171;
+            
+            /* Fondo y tarjetas */
+            --bg-color: #121212;
+            --card-color: #1e1e1e;
+            --card-hover: #2d2d2d;
+            --border-color: #333333;
+            
+            /* Texto */
+            --text-color: #f5f5f5;
+            --text-secondary: #a3a3a3;
+            --text-muted: #737373;
+            
+            /* Efectos */
+            --glass-bg: rgba(30, 30, 30, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            --neon-glow: 0 0 10px rgba(255, 0, 0, 0.5);
+            --income-glow: 0 0 10px rgba(16, 185, 129, 0.5);
+            --expense-glow: 0 0 10px rgba(239, 68, 68, 0.5);
+            
+            /* Sombras y efectos */
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+            --transition-normal: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            touch-action: manipulation;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 0, 0, 0.03) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.03) 0%, transparent 20%),
+                radial-gradient(circle at 50% 50%, rgba(239, 68, 68, 0.03) 0%, transparent 30%);
+        }
+
+        .container {
+            padding: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: #FF0000;
+            color: white;
+            text-align: center;
+            padding: 24px 0;
+            margin-bottom: 20px;
+            border-radius: 0 0 20px 20px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::after {
+            content: "";
+            position: absolute;
+            bottom: -50px;
+            left: -50px;
+            width: calc(100% + 100px);
+            height: 100px;
+            background: linear-gradient(rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(-5deg);
+        }
+
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 4px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            background: linear-gradient(to right, #fff, #f5f5f5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        header p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .balance-container {
+            background-color: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 16px;
+            box-shadow: var(--glass-shadow);
+            transition: var(--transition-normal);
+        }
+
+        .balance-container:hover {
+            box-shadow: var(--neon-glow), var(--glass-shadow);
+            transform: translateY(-2px);
+        }
+
+        .balance-title {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .balance-amount {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            background: linear-gradient(to right, #fff, #f5f5f5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .income-expense-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .income-box, .expense-box {
+            flex: 1;
+            background-color: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition-normal);
+        }
+
+        .income-box {
+            border-left: 3px solid var(--income-color);
+        }
+
+        .expense-box {
+            border-left: 3px solid var(--expense-color);
+        }
+
+        .income-box:hover {
+            box-shadow: var(--income-glow), var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .expense-box:hover {
+            box-shadow: var(--expense-glow), var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .box-title {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .income-amount {
+            color: var(--income-light);
+            font-weight: 600;
+            font-size: 1.4rem;
+            text-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+        }
+
+        .expense-amount {
+            color: var(--expense-light);
+            font-weight: 600;
+            font-size: 1.4rem;
+            text-shadow: 0 0 8px rgba(239, 68, 68, 0.3);
+        }
+
+        .transaction-list {
+            background-color: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 80px;
+            box-shadow: var(--glass-shadow);
+        }
+
+        .list-title {
+            font-size: 1.1rem;
+            color: var(--text-color);
+            margin-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            transition: var(--transition-normal);
+        }
+
+        .transaction:last-child {
+            border-bottom: none;
+        }
+
+        .transaction:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding-left: 8px;
+            padding-right: 8px;
+            margin-left: -8px;
+            margin-right: -8px;
+        }
+
+        .transaction-info {
+            display: flex;
+            flex-direction: column;
+            width: 80%;
+        }
+
+        .transaction-name {
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .transaction-date {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .transaction.income .transaction-amount {
+            color: var(--income-light);
+        }
+
+        .transaction.expense .transaction-amount {
+            color: var(--expense-light);
+        }
+
+        .transaction-amount {
+            font-weight: 600;
+            font-size: 1.05rem;
+        }
+
+        .transaction-actions {
+            position: relative;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 4px;
+            transition: var(--transition-normal);
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+        }
+
+        .action-menu {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background-color: var(--card-color);
+            border-radius: 10px;
+            box-shadow: var(--shadow-lg);
+            z-index: 10;
+            display: none;
+            min-width: 130px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .action-menu button {
+            display: block;
+            width: 100%;
+            padding: 10px 12px;
+            text-align: left;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: var(--transition-normal);
+            font-size: 0.9rem;
+        }
+
+        .action-menu button:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .action-menu button.edit {
+            color: var(--primary-light);
+        }
+
+        .action-menu button.delete {
+            color: var(--expense-light);
+        }
+
+        .no-transactions {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 24px 0;
+            font-size: 0.9rem;
+        }
+
+        .fab-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            z-index: 999;
+            gap: 12px;
+        }
+
+        .fab {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            box-shadow: var(--shadow-lg);
+            cursor: pointer;
+            font-size: 26px;
+            transition: var(--transition-bounce);
+            border: none;
+        }
+
+        .fab:active {
+            transform: scale(0.92);
+        }
+
+        .fab-income {
+            background: linear-gradient(135deg, var(--income-color) 0%, var(--income-light) 100%);
+        }
+
+        .fab-income:hover {
+            box-shadow: var(--income-glow), var(--shadow-lg);
+            transform: translateY(-3px) rotate(5deg);
+        }
+
+        .fab-expense {
+            background: linear-gradient(135deg, var(--expense-color) 0%, var(--expense-light) 100%);
+        }
+
+        .fab-expense:hover {
+            box-shadow: var(--expense-glow), var(--shadow-lg);
+            transform: translateY(-3px) rotate(-5deg);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: var(--card-color);
+            border-radius: 18px;
+            padding: 20px;
+            width: 90%;
+            max-width: 340px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .modal-title {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: var(--transition-normal);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-modal:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-color);
+            transition: var(--transition-normal);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.2);
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 14px;
+            padding-right: 35px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-normal);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-income {
+            background: linear-gradient(135deg, var(--income-color) 0%, var(--income-light) 100%);
+        }
+
+        .btn-income:hover {
+            box-shadow: var(--income-glow);
+            transform: translateY(-2px);
+        }
+
+        .btn-expense {
+            background: linear-gradient(135deg, var(--expense-color) 0%, var(--expense-light) 100%);
+        }
+
+        .btn-expense:hover {
+            box-shadow: var(--expense-glow);
+            transform: translateY(-2px);
+        }
+
+        /* Estilos para el teclado numérico */
+        .numeric-keyboard {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .keyboard-btn {
+            padding: 12px 8px;
+            font-size: 1.1rem;
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: var(--transition-normal);
+            font-weight: 500;
+        }
+
+        .keyboard-btn:active {
+            transform: scale(0.95);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .keyboard-btn.zero {
+            grid-column: span 2;
+        }
+
+        .keyboard-btn.clear {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--expense-light);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .keyboard-btn.backspace {
+            background-color: rgba(100, 116, 139, 0.1);
+            color: var(--text-secondary);
+        }
+
+        .keyboard-btn.decimal {
+            background-color: rgba(100, 116, 139, 0.1);
+            color: var(--text-secondary);
+        }
+
+        /* Deshabilitar teclado virtual en móviles */
+        .no-virtual-keyboard {
+            caret-color: transparent;
+        }
+        .no-virtual-keyboard:focus {
+            outline: none;
+        }
+
+        /* Filtro de mes */
+        .month-filter {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            background-color: rgba(255, 255, 255, 0.03);
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .month-filter label {
+            margin-bottom: 0;
+            margin-right: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .month-filter select {
+            flex-grow: 1;
+            max-width: 180px;
+            margin: 0;
+            padding: 6px 10px;
+            font-size: 0.9rem;
+        }
+
+        .month-nav {
+            display: flex;
+            gap: 6px;
+        }
+
+        .month-nav-btn {
+            background-color: rgba(255, 0, 0, 0.1);
+            color: var(--primary-light);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            border-radius: 6px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: var(--transition-normal);
+        }
+
+        .month-nav-btn:hover {
+            background-color: rgba(255, 0, 0, 0.2);
+        }
+
+        /* Modal de confirmación */
+        .confirm-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1001;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .confirm-content {
+            background-color: var(--card-color);
+            border-radius: 16px;
+            padding: 20px;
+            width: 90%;
+            max-width: 300px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        .confirm-content h3 {
+            margin-bottom: 12px;
+            font-size: 1.2rem;
+        }
+
+        .confirm-content p {
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .confirm-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .confirm-btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition-normal);
+            min-width: 90px;
+            font-size: 0.9rem;
+        }
+
+        .confirm-btn.yes {
+            background: linear-gradient(135deg, var(--expense-color) 0%, var(--expense-light) 100%);
+            color: white;
+        }
+
+        .confirm-btn.yes:hover {
+            box-shadow: var(--expense-glow);
+            transform: translateY(-2px);
+        }
+
+        .confirm-btn.no {
+            background-color: rgba(100, 116, 139, 0.1);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .confirm-btn.no:hover {
+            background-color: rgba(100, 116, 139, 0.2);
+        }
+
+        /* Resumen mensual */
+        .monthly-summary {
+            padding: 12px 0;
+        }
+
+        .monthly-summary h3 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        .monthly-summary p {
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .monthly-summary p:last-child {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 12px;
+            }
+            
+            header {
+                padding: 20px 0;
+            }
+            
+            header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .balance-amount {
+                font-size: 1.8rem;
+            }
+            
+            .income-amount, .expense-amount {
+                font-size: 1.2rem;
+            }
+            
+            .modal-content {
+                padding: 18px;
+                max-width: 320px;
+            }
+            
+            .form-group {
+                margin-bottom: 14px;
+            }
+
+            .fab {
+                width: 52px;
+                height: 52px;
+                font-size: 24px;
+            }
+            
+            .keyboard-btn {
+                padding: 10px 6px;
+                font-size: 1rem;
+            }
+        }
+        
+        @media (max-width: 350px) {
+            .modal-content {
+                max-width: 280px;
+                padding: 16px;
+            }
+            
+            .modal-title {
+                font-size: 1.1rem;
+            }
+            
+            .close-modal {
+                width: 28px;
+                height: 28px;
+                font-size: 1.1rem;
+            }
+            
+            input, select {
+                padding: 8px 10px;
+                font-size: 0.9rem;
+            }
+            
+            .btn {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+            
+            .numeric-keyboard {
+                gap: 6px;
+            }
+            
+            .keyboard-btn {
+                padding: 8px 4px;
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>EnpenGO</h1>
+        <p>Tu gestor de gastos personal</p>
+    </header>
+
+    <div class="container">
+        <div class="balance-container">
+            <p class="balance-title">Balance Total</p>
+            <h2 class="balance-amount" id="balance">$0.00</h2>
+        </div>
+
+        <div class="income-expense-container">
+            <div class="income-box">
+                <p class="box-title">Ingresos</p>
+                <p class="income-amount" id="income-total">$0.00</p>
+            </div>
+            <div class="expense-box">
+                <p class="box-title">Gastos</p>
+                <p class="expense-amount" id="expense-total">$0.00</p>
+            </div>
+        </div>
+        
+        <div class="transaction-list">
+            <h3 class="list-title">Historial de Transacciones</h3>
+        
+            <div id="transaction-container">
+                <p class="no-transactions" id="no-transactions">No hay transacciones registradas</p>
+            </div>
+        </div>
+        
+        <div id="resumen-mensual" style="background-color: var(--glass-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 14px; padding: 16px; margin-bottom: 80px; box-shadow: var(--glass-shadow);">
+            <div class="month-filter">
+                <label for="month-select">Mes:</label>
+                <select id="month-select"></select>
+                <div class="month-nav">
+                    <button id="prev-month" class="month-nav-btn">&lt;</button>
+                    <button id="next-month" class="month-nav-btn">&gt;</button>
+                </div>
+            </div>
+            <!-- Aquí se mostrará el resumen mensual -->
+        </div>
+        
+        <div class="fab-container">
+            <div class="fab fab-income" id="add-income">
+                <span>+</span>
+            </div>
+            <div class="fab fab-expense" id="add-expense">
+                <span>-</span>
+            </div>
+        </div>
+        
+        <!-- Modal Ingreso -->
+        <div class="modal" id="income-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Nuevo Ingreso</h3>
+                    <button class="close-modal" id="close-income-modal">&times;</button>
+                </div>
+                <form id="income-form">
+                    <div class="form-group">
+                        <label for="income-descripcion">Descripción</label>
+                        <select name="descripcion" id="income-descripcion" required>
+                            <option value="Otros" selected>Otros</option>
+                            <option value="Salario">Salario</option>
+                            <option value="Inversiones">Inversiones</option>
+                            <option value="Regalo">Regalo</option>
+                            <option value="Freelance">Freelance</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="income-fecha">Fecha</label>
+                        <input type="date" name="fecha" id="income-fecha" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="income-amount">Monto ($)</label>
+                        <input type="number" id="income-amount" class="no-virtual-keyboard" min="0.01" step="0.01" placeholder="0.00" required readonly>
+                        <div class="numeric-keyboard">
+                            <button type="button" class="keyboard-btn" data-value="1">1</button>
+                            <button type="button" class="keyboard-btn" data-value="2">2</button>
+                            <button type="button" class="keyboard-btn" data-value="3">3</button>
+                            <button type="button" class="keyboard-btn" data-value="4">4</button>
+                            <button type="button" class="keyboard-btn" data-value="5">5</button>
+                            <button type="button" class="keyboard-btn" data-value="6">6</button>
+                            <button type="button" class="keyboard-btn" data-value="7">7</button>
+                            <button type="button" class="keyboard-btn" data-value="8">8</button>
+                            <button type="button" class="keyboard-btn" data-value="9">9</button>
+                            <button type="button" class="keyboard-btn decimal" data-value=".">.</button>
+                            <button type="button" class="keyboard-btn zero" data-value="0">0</button>
+                            <button type="button" class="keyboard-btn backspace" data-action="backspace">⌫</button>
+                            <button type="button" class="keyboard-btn clear" data-action="clear">C</button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-income">Agregar Ingreso</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Modal Gasto -->
+        <div class="modal" id="expense-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Nuevo Gasto</h3>
+                    <button class="close-modal" id="close-expense-modal">&times;</button>
+                </div>
+                <form id="expense-form">
+                    <div class="form-group">
+                        <label for="expense-descripcion">Descripción</label>
+                        <select name="descripcion" id="expense-descripcion" required>
+                            <option value="Otros" selected>Otros</option>
+                            <option value="Comida">Comida</option>
+                            <option value="Transporte">Transporte</option>
+                            <option value="Entretenimiento">Entretenimiento</option>
+                            <option value="Servicios">Servicios</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="expense-fecha">Fecha</label>
+                        <input type="date" name="fecha" id="expense-fecha" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="expense-amount">Monto ($)</label>
+                        <input type="number" id="expense-amount" class="no-virtual-keyboard" min="0.01" step="0.01" placeholder="0.00" required readonly>
+                        <div class="numeric-keyboard">
+                            <button type="button" class="keyboard-btn" data-value="1">1</button>
+                            <button type="button" class="keyboard-btn" data-value="2">2</button>
+                            <button type="button" class="keyboard-btn" data-value="3">3</button>
+                            <button type="button" class="keyboard-btn" data-value="4">4</button>
+                            <button type="button" class="keyboard-btn" data-value="5">5</button>
+                            <button type="button" class="keyboard-btn" data-value="6">6</button>
+                            <button type="button" class="keyboard-btn" data-value="7">7</button>
+                            <button type="button" class="keyboard-btn" data-value="8">8</button>
+                            <button type="button" class="keyboard-btn" data-value="9">9</button>
+                            <button type="button" class="keyboard-btn decimal" data-value=".">.</button>
+                            <button type="button" class="keyboard-btn zero" data-value="0">0</button>
+                            <button type="button" class="keyboard-btn backspace" data-action="backspace">⌫</button>
+                            <button type="button" class="keyboard-btn clear" data-action="clear">C</button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-expense">Agregar Gasto</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Modal de Confirmación -->
+        <div class="confirm-modal" id="confirm-modal">
+            <div class="confirm-content">
+                <h3>¿Estás seguro?</h3>
+                <p>Esta acción eliminará la transacción permanentemente.</p>
+                <div class="confirm-buttons">
+                    <button class="confirm-btn yes" id="confirm-yes">Sí, eliminar</button>
+                    <button class="confirm-btn no" id="confirm-no">Cancelar</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal de Edición -->
+        <div class="modal" id="edit-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Editar Transacción</h3>
+                    <button class="close-modal" id="close-edit-modal">&times;</button>
+                </div>
+                <form id="edit-form">
+                    <div class="form-group">
+                        <label for="edit-descripcion">Descripción</label>
+                        <select name="descripcion" id="edit-descripcion" required>
+                            <option value="Otros">Otros</option>
+                            <option value="Salario">Salario</option>
+                            <option value="Inversiones">Inversiones</option>
+                            <option value="Regalo">Regalo</option>
+                            <option value="Freelance">Freelance</option>
+                            <option value="Comida">Comida</option>
+                            <option value="Transporte">Transporte</option>
+                            <option value="Entretenimiento">Entretenimiento</option>
+                            <option value="Servicios">Servicios</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit-fecha">Fecha</label>
+                        <input type="date" name="fecha" id="edit-fecha" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit-amount">Monto ($)</label>
+                        <input type="number" id="edit-amount" class="no-virtual-keyboard" min="0.01" step="0.01" required>
+                        <div class="numeric-keyboard">
+                            <button type="button" class="keyboard-btn" data-value="1">1</button>
+                            <button type="button" class="keyboard-btn" data-value="2">2</button>
+                            <button type="button" class="keyboard-btn" data-value="3">3</button>
+                            <button type="button" class="keyboard-btn" data-value="4">4</button>
+                            <button type="button" class="keyboard-btn" data-value="5">5</button>
+                            <button type="button" class="keyboard-btn" data-value="6">6</button>
+                            <button type="button" class="keyboard-btn" data-value="7">7</button>
+                            <button type="button" class="keyboard-btn" data-value="8">8</button>
+                            <button type="button" class="keyboard-btn" data-value="9">9</button>
+                            <button type="button" class="keyboard-btn decimal" data-value=".">.</button>
+                            <button type="button" class="keyboard-btn zero" data-value="0">0</button>
+                            <button type="button" class="keyboard-btn backspace" data-action="backspace">⌫</button>
+                            <button type="button" class="keyboard-btn clear" data-action="clear">C</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-type">Tipo</label>
+                        <select id="edit-type" required>
+                            <option value="income">Ingreso</option>
+                            <option value="expense">Gasto</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn" id="edit-submit-btn">Guardar Cambios</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Elementos del DOM
+        const balanceEl = document.getElementById('balance');
+        const incomeTotalEl = document.getElementById('income-total');
+        const expenseTotalEl = document.getElementById('expense-total');
+        const transactionContainer = document.getElementById('transaction-container');
+        const noTransactionsEl = document.getElementById('no-transactions');
+        const monthSelect = document.getElementById('month-select');
+        const prevMonthBtn = document.getElementById('prev-month');
+        const nextMonthBtn = document.getElementById('next-month');
+        
+        // Botones FAB
+        const addIncomeBtn = document.getElementById('add-income');
+        const addExpenseBtn = document.getElementById('add-expense');
+        
+        // Modales
+        const incomeModal = document.getElementById('income-modal');
+        const expenseModal = document.getElementById('expense-modal');
+        const confirmModal = document.getElementById('confirm-modal');
+        const editModal = document.getElementById('edit-modal');
+        const closeIncomeModal = document.getElementById('close-income-modal');
+        const closeExpenseModal = document.getElementById('close-expense-modal');
+        const closeEditModal = document.getElementById('close-edit-modal');
+        const confirmYesBtn = document.getElementById('confirm-yes');
+        const confirmNoBtn = document.getElementById('confirm-no');
+        
+        // Formularios
+        const incomeForm = document.getElementById('income-form');
+        const expenseForm = document.getElementById('expense-form');
+        const editForm = document.getElementById('edit-form');
+        
+        // Elementos del teclado numérico
+        const incomeAmountInput = document.getElementById('income-amount');
+        const expenseAmountInput = document.getElementById('expense-amount');
+        const editAmountInput = document.getElementById('edit-amount');
+        
+        // Variables de estado
+        let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        let transactionToDelete = null;
+        let transactionToEdit = null;
+        
+        // Nombres de los meses
+        const monthNames = [
+            "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+            "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+        ];
+        
+        // Funciones
+        function formatMoney(amount) {
+            const absAmount = Math.abs(parseFloat(amount) || 0);
+            const formattedAmount = new Intl.NumberFormat('es-ES', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(absAmount);
+            
+            return '$' + formattedAmount;
+        }
+        
+        function setupMonthFilter() {
+            // Limpiar opciones existentes
+            monthSelect.innerHTML = '';
+            
+            // Obtener el mes actual
+            const today = new Date();
+            const currentMonthIndex = today.getMonth();
+            const currentYear = today.getFullYear();
+            
+            // Agregar opciones para los próximos 12 meses
+            for (let i = 0; i < 12; i++) {
+                const date = new Date(currentYear, currentMonthIndex + i, 1);
+                const month = date.getMonth();
+                const year = date.getFullYear();
+                const monthName = monthNames[month];
+                const option = document.createElement('option');
+                option.value = `${year}-${String(month + 1).padStart(2, '0')}`;
+                option.textContent = `${monthName} ${year}`;
+                
+                // Seleccionar el mes actual
+                if (i === 0) {
+                    option.selected = true;
+                    currentMonth = month;
+                    currentYear = year;
+                }
+                
+                monthSelect.appendChild(option);
+            }
+        }
+        
+        function changeMonth(offset) {
+            const selectedDate = new Date(currentYear, currentMonth + offset, 1);
+            currentMonth = selectedDate.getMonth();
+            currentYear = selectedDate.getFullYear();
+            
+            // Actualizar el select
+            const monthValue = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
+            monthSelect.value = monthValue;
+            
+            updateMonthlySummary();
+        }
+        
+        function updateMonthlySummary() {
+            const selectedMonth = monthSelect.value;
+            const [year, month] = selectedMonth.split('-');
+            
+            const filteredTransactions = transactions.filter(transaction => {
+                const transactionDate = new Date(transaction.date);
+                const transactionMonth = transactionDate.getMonth() + 1;
+                const transactionYear = transactionDate.getFullYear();
+                
+                return transactionYear.toString() === year && 
+                       String(transactionMonth).padStart(2, '0') === month;
+            });
+            
+            const incomeTotal = filteredTransactions
+                .filter(t => t.type === 'income')
+                .reduce((sum, t) => sum + t.amount, 0);
+                
+            const expenseTotal = filteredTransactions
+                .filter(t => t.type === 'expense')
+                .reduce((sum, t) => sum + t.amount, 0);
+                
+            const balance = incomeTotal - expenseTotal;
+            
+            const summaryContainer = document.getElementById('resumen-mensual');
+            summaryContainer.innerHTML = `
+                <div class="month-filter">
+                    <label for="month-select">Mes:</label>
+                    <select id="month-select"></select>
+                    <div class="month-nav">
+                        <button id="prev-month" class="month-nav-btn">&lt;</button>
+                        <button id="next-month" class="month-nav-btn">&gt;</button>
+                    </div>
+                </div>
+                <div class="monthly-summary">
+                    <h3>Resumen de ${monthNames[parseInt(month) - 1]} ${year}</h3>
+                    <p>Ingresos: <span style="color:var(--income-light)">${formatMoney(incomeTotal)}</span></p>
+                    <p>Gastos: <span style="color:var(--expense-light)">${formatMoney(expenseTotal)}</span></p>
+                    <p>Balance: <strong style="color:${balance >= 0 ? 'var(--income-light)' : 'var(--expense-light)'}">${balance >= 0 ? '+' : '-'}${formatMoney(balance)}</strong></p>
+                </div>
+            `;
+            
+            // Volver a configurar los event listeners
+            document.getElementById('month-select').addEventListener('change', (e) => {
+                const [y, m] = e.target.value.split('-');
+                currentYear = parseInt(y);
+                currentMonth = parseInt(m) - 1;
+                updateMonthlySummary();
+            });
+            
+            document.getElementById('prev-month').addEventListener('click', () => changeMonth(-1));
+            document.getElementById('next-month').addEventListener('click', () => changeMonth(1));
+        }
+        
+        // Función para manejar el teclado numérico
+        function setupNumericKeyboard(inputElement, displayElement = null) {
+            const keyboardButtons = inputElement.parentElement.querySelectorAll(`[data-value], [data-action]`);
+            
+            keyboardButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const value = button.getAttribute('data-value');
+                    const action = button.getAttribute('data-action');
+                    
+                    if (action === 'backspace') {
+                        // Eliminar el último carácter
+                        inputElement.value = inputElement.value.slice(0, -1);
+                    } else if (action === 'clear') {
+                        // Limpiar todo
+                        inputElement.value = '';
+                    } else if (value) {
+                        // Agregar el valor al input
+                        // Validar que solo haya un punto decimal
+                        if (value === '.' && inputElement.value.includes('.')) {
+                            return;
+                        }
+                        inputElement.value += value;
+                    }
+                    
+                    // Actualizar el display si existe
+                    if (displayElement) {
+                        const amount = inputElement.value ? parseFloat(inputElement.value) : 0;
+                        displayElement.textContent = formatMoney(amount);
+                    }
+                });
+            });
+            
+            // Prevenir que aparezca el teclado virtual al tocar el input
+            inputElement.addEventListener('focus', (e) => {
+                e.preventDefault();
+                inputElement.blur();
+            });
+        }
+    
+        function updateUI() {
+            const incomeTotal = transactions
+                .filter(transaction => transaction.type === 'income')
+                .reduce((total, transaction) => total + transaction.amount, 0);
+            
+            const expenseTotal = transactions
+                .filter(transaction => transaction.type === 'expense')
+                .reduce((total, transaction) => total + transaction.amount, 0);
+            
+            const balance = incomeTotal - expenseTotal;
+            
+            // Actualizar los totales
+            balanceEl.textContent = formatMoney(balance);
+            incomeTotalEl.textContent = formatMoney(incomeTotal);
+            expenseTotalEl.textContent = formatMoney(expenseTotal);
+            
+            // Actualizar la lista de transacciones
+            if (transactions.length > 0) {
+                noTransactionsEl.style.display = 'none';
+                renderTransactionList();
+            } else {
+                noTransactionsEl.style.display = 'block';
+                transactionContainer.innerHTML = '';
+                transactionContainer.appendChild(noTransactionsEl);
+            }
+            
+            // Actualizar el resumen mensual
+            updateMonthlySummary();
+            
+            // Guardar en localStorage
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+        }
+    
+        function renderTransactionList() {
+            // Limpiar el contenedor
+            transactionContainer.innerHTML = '';
+            
+            // Ordenar transacciones por fecha (más recientes primero)
+            const sortedTransactions = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            sortedTransactions.forEach(transaction => {
+                const transactionEl = document.createElement('div');
+                transactionEl.classList.add('transaction');
+                transactionEl.classList.add(transaction.type);
+                transactionEl.setAttribute('data-id', transaction.id);
+                
+                // Formatear fecha
+                const date = new Date(transaction.date);
+                const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+                
+                transactionEl.innerHTML = `
+                    <div class="transaction-info">
+                        <span class="transaction-name">${transaction.name}</span>
+                        <span class="transaction-date">${formattedDate}</span>
+                    </div>
+                    <span class="transaction-amount">${transaction.type === 'income' ? '+' : '-'}${formatMoney(transaction.amount)}</span>
+                    <div class="transaction-actions">
+                        <button class="action-btn">⋮</button>
+                        <div class="action-menu">
+                            <button class="edit">✏️ Editar</button>
+                            <button class="delete">🗑️ Eliminar</button>
+                        </div>
+                    </div>
+                `;
+                
+                transactionContainer.appendChild(transactionEl);
+                
+                // Configurar menú de acciones
+                const actionBtn = transactionEl.querySelector('.action-btn');
+                const actionMenu = transactionEl.querySelector('.action-menu');
+                
+                actionBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    // Cerrar otros menús abiertos
+                    document.querySelectorAll('.action-menu').forEach(menu => {
+                        if (menu !== actionMenu) menu.style.display = 'none';
+                    });
+                    actionMenu.style.display = actionMenu.style.display === 'block' ? 'none' : 'block';
+                });
+                
+                // Configurar botones del menú
+                const editBtn = transactionEl.querySelector('.action-menu .edit');
+                const deleteBtn = transactionEl.querySelector('.action-menu .delete');
+                
+                editBtn.addEventListener('click', () => {
+                    openEditModal(transaction);
+                    actionMenu.style.display = 'none';
+                });
+                
+                deleteBtn.addEventListener('click', () => {
+                    transactionToDelete = transaction.id;
+                    confirmModal.style.display = 'flex';
+                    actionMenu.style.display = 'none';
+                });
+            });
+            
+            // Cerrar menús al hacer clic fuera
+            document.addEventListener('click', () => {
+                document.querySelectorAll('.action-menu').forEach(menu => {
+                    menu.style.display = 'none';
+                });
+            });
+        }
+        
+        function openEditModal(transaction) {
+            transactionToEdit = transaction.id;
+            document.getElementById('edit-descripcion').value = transaction.name;
+            document.getElementById('edit-fecha').value = transaction.date;
+            document.getElementById('edit-amount').value = transaction.amount;
+            document.getElementById('edit-type').value = transaction.type;
+            
+            // Cambiar color del botón según el tipo
+            const submitBtn = document.getElementById('edit-submit-btn');
+            if (transaction.type === 'income') {
+                submitBtn.className = 'btn btn-income';
+            } else {
+                submitBtn.className = 'btn btn-expense';
+            }
+            
+            editModal.style.display = 'flex';
+        }
+        
+        function deleteTransaction(id) {
+            transactions = transactions.filter(transaction => transaction.id !== id);
+            updateUI();
+            confirmModal.style.display = 'none';
+            transactionToDelete = null;
+        }
+        
+        function updateTransaction(id, updatedData) {
+            transactions = transactions.map(transaction => {
+                if (transaction.id === id) {
+                    return { ...transaction, ...updatedData };
+                }
+                return transaction;
+            });
+            updateUI();
+        }
+    
+        function addTransaction(type) {
+            const form = type === 'income' ? incomeForm : expenseForm;
+            const descripcionInput = document.getElementById(`${type}-descripcion`);
+            const amountInput = document.getElementById(`${type}-amount`);
+            const dateInput = document.getElementById(`${type}-fecha`);
+            
+            const descripcion = descripcionInput.value;
+            const amount = parseFloat(amountInput.value);
+            const date = dateInput.value;
+            
+            if (isNaN(amount) || amount <= 0) {
+                alert('Por favor ingresa un monto válido.');
+                return;
+            }
+            
+            const transaction = {
+                id: Date.now().toString(),
+                name: descripcion,
+                amount: amount,
+                type: type,
+                date: date
+            };
+            
+            transactions.push(transaction);
+            updateUI();
+            
+            // Limpiar formulario
+            form.reset();
+            amountInput.value = '';
+            
+            // Cerrar modal
+            document.getElementById(`${type}-modal`).style.display = 'none';
+        }
+        
+        // Event Listeners
+        addIncomeBtn.addEventListener('click', () => {
+            incomeModal.style.display = 'flex';
+            document.getElementById('income-fecha').value = new Date().toISOString().split('T')[0];
+            document.getElementById('income-amount').value = '';
+        });
+        
+        addExpenseBtn.addEventListener('click', () => {
+            expenseModal.style.display = 'flex';
+            document.getElementById('expense-fecha').value = new Date().toISOString().split('T')[0];
+            document.getElementById('expense-amount').value = '';
+        });
+        
+        closeIncomeModal.addEventListener('click', () => {
+            incomeModal.style.display = 'none';
+        });
+        
+        closeExpenseModal.addEventListener('click', () => {
+            expenseModal.style.display = 'none';
+        });
+        
+        closeEditModal.addEventListener('click', () => {
+            editModal.style.display = 'none';
+        });
+        
+        confirmYesBtn.addEventListener('click', () => {
+            if (transactionToDelete) {
+                deleteTransaction(transactionToDelete);
+            }
+        });
+        
+        confirmNoBtn.addEventListener('click', () => {
+            confirmModal.style.display = 'none';
+            transactionToDelete = null;
+        });
+        
+        // Cambiar el color del botón de edición según el tipo seleccionado
+        document.getElementById('edit-type').addEventListener('change', function() {
+            const submitBtn = document.getElementById('edit-submit-btn');
+            if (this.value === 'income') {
+                submitBtn.className = 'btn btn-income';
+            } else {
+                submitBtn.className = 'btn btn-expense';
+            }
+        });
+        
+        editForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const updatedData = {
+                name: document.getElementById('edit-descripcion').value,
+                date: document.getElementById('edit-fecha').value,
+                amount: parseFloat(document.getElementById('edit-amount').value),
+                type: document.getElementById('edit-type').value
+            };
+            
+            if (isNaN(updatedData.amount) || updatedData.amount <= 0) {
+                alert('Por favor ingresa un monto válido.');
+                return;
+            }
+            
+            updateTransaction(transactionToEdit, updatedData);
+            editModal.style.display = 'none';
+            transactionToEdit = null;
+        });
+        
+        // Cerrar modales al hacer clic fuera
+        window.addEventListener('click', (e) => {
+            if (e.target === incomeModal) {
+                incomeModal.style.display = 'none';
+            }
+            if (e.target === expenseModal) {
+                expenseModal.style.display = 'none';
+            }
+            if (e.target === confirmModal) {
+                confirmModal.style.display = 'none';
+                transactionToDelete = null;
+            }
+            if (e.target === editModal) {
+                editModal.style.display = 'none';
+                transactionToEdit = null;
+            }
+        });
+        
+        // Manejar envío de formularios
+        incomeForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            addTransaction('income');
+        });
+        
+        expenseForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            addTransaction('expense');
+        });
+        
+        // Configurar teclados numéricos
+        setupNumericKeyboard(incomeAmountInput);
+        setupNumericKeyboard(expenseAmountInput);
+        setupNumericKeyboard(editAmountInput);
+        
+        // Configurar navegación de meses
+        prevMonthBtn.addEventListener('click', () => changeMonth(-1));
+        nextMonthBtn.addEventListener('click', () => changeMonth(1));
+        
+        monthSelect.addEventListener('change', (e) => {
+            const [year, month] = e.target.value.split('-');
+            currentYear = parseInt(year);
+            currentMonth = parseInt(month) - 1;
+            updateMonthlySummary();
+        });
+        
+        // Inicializar UI
+        setupMonthFilter();
+        updateUI();
+    </script>
+</body>
+</html>
