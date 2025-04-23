@@ -208,7 +208,7 @@
             border: 1px solid var(--glass-border);
             border-radius: 14px;
             padding: 16px;
-            margin-bottom: 80px;
+            margin-bottom: 20px;
             box-shadow: var(--glass-shadow);
         }
 
@@ -736,6 +736,95 @@
             font-weight: 600;
         }
 
+        /* Login y Registro */
+        .auth-container {
+            background-color: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 24px;
+            margin: 20px auto;
+            max-width: 400px;
+            box-shadow: var(--glass-shadow);
+        }
+
+        .auth-title {
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 1.5rem;
+            color: var(--text-color);
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .auth-btn {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-normal);
+            margin-top: 8px;
+        }
+
+        .auth-btn:hover {
+            box-shadow: var(--neon-glow);
+            transform: translateY(-2px);
+        }
+
+        .auth-toggle {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .auth-toggle a {
+            color: var(--primary-light);
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .auth-toggle a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: var(--expense-light);
+            font-size: 0.85rem;
+            margin-top: 4px;
+            display: none;
+        }
+
+        /* Botón Ver Más */
+        .load-more {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 16px;
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition-normal);
+            font-weight: 500;
+        }
+
+        .load-more:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
         @media (max-width: 480px) {
             .container {
                 padding: 12px;
@@ -776,6 +865,10 @@
                 padding: 10px 6px;
                 font-size: 1rem;
             }
+            
+            .auth-container {
+                padding: 20px;
+            }
         }
         
         @media (max-width: 350px) {
@@ -812,236 +905,314 @@
                 padding: 8px 4px;
                 font-size: 0.95rem;
             }
+            
+            .auth-container {
+                padding: 16px;
+            }
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>EnpenGO</h1>
-        <p>Tu gestor de gastos personal</p>
-    </header>
+    <!-- Pantalla de Login/Registro -->
+    <div id="auth-screen" style="display: none;">
+        <header>
+            <h1>EnpenGO</h1>
+            <p>Tu gestor de gastos personal</p>
+        </header>
 
-    <div class="container">
-        <div class="balance-container">
-            <p class="balance-title">Balance Total</p>
-            <h2 class="balance-amount" id="balance">$0.00</h2>
+        <div class="auth-container" id="login-container">
+            <h2 class="auth-title">Iniciar Sesión</h2>
+            <form class="auth-form" id="login-form">
+                <div class="form-group">
+                    <label for="login-email">Correo Electrónico</label>
+                    <input type="email" id="login-email" required>
+                    <div class="error-message" id="login-email-error"></div>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Contraseña</label>
+                    <input type="password" id="login-password" required>
+                    <div class="error-message" id="login-password-error"></div>
+                </div>
+                <button type="submit" class="auth-btn">Ingresar</button>
+            </form>
+            <div class="auth-toggle">
+                ¿No tienes una cuenta? <a id="show-register">Regístrate</a>
+            </div>
         </div>
 
-        <div class="income-expense-container">
-            <div class="income-box">
-                <p class="box-title">Ingresos</p>
-                <p class="income-amount" id="income-total">$0.00</p>
-            </div>
-            <div class="expense-box">
-                <p class="box-title">Gastos</p>
-                <p class="expense-amount" id="expense-total">$0.00</p>
+        <div class="auth-container" id="register-container" style="display: none;">
+            <h2 class="auth-title">Crear Cuenta</h2>
+            <form class="auth-form" id="register-form">
+                <div class="form-group">
+                    <label for="register-name">Nombre</label>
+                    <input type="text" id="register-name" required>
+                    <div class="error-message" id="register-name-error"></div>
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Correo Electrónico</label>
+                    <input type="email" id="register-email" required>
+                    <div class="error-message" id="register-email-error"></div>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Contraseña</label>
+                    <input type="password" id="register-password" required minlength="6">
+                    <div class="error-message" id="register-password-error"></div>
+                </div>
+                <div class="form-group">
+                    <label for="register-confirm">Confirmar Contraseña</label>
+                    <input type="password" id="register-confirm" required>
+                    <div class="error-message" id="register-confirm-error"></div>
+                </div>
+                <button type="submit" class="auth-btn">Registrarse</button>
+            </form>
+            <div class="auth-toggle">
+                ¿Ya tienes una cuenta? <a id="show-login">Inicia Sesión</a>
             </div>
         </div>
-        
-        <div class="transaction-list">
-            <h3 class="list-title">Historial de Transacciones</h3>
-        
-            <div id="transaction-container">
-                <p class="no-transactions" id="no-transactions">No hay transacciones registradas</p>
+    </div>
+
+    <!-- Pantalla Principal -->
+    <div id="main-screen" style="display: none;">
+        <header>
+            <h1>EnpenGO</h1>
+            <p>Tu gestor de gastos personal</p>
+            <button id="logout-btn" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: white; font-size: 0.9rem; cursor: pointer;">Cerrar Sesión</button>
+        </header>
+
+        <div class="container">
+            <div class="balance-container">
+                <p class="balance-title">Balance Total</p>
+                <h2 class="balance-amount" id="balance">$0.00</h2>
             </div>
-        </div>
-        
-        <div id="resumen-mensual" style="background-color: var(--glass-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 14px; padding: 16px; margin-bottom: 80px; box-shadow: var(--glass-shadow);">
-            <div class="month-filter">
-                <label for="month-select">Mes:</label>
-                <select id="month-select"></select>
-                <div class="month-nav">
-                    <button id="prev-month" class="month-nav-btn">&lt;</button>
-                    <button id="next-month" class="month-nav-btn">&gt;</button>
+
+            <div class="income-expense-container">
+                <div class="income-box">
+                    <p class="box-title">Ingresos</p>
+                    <p class="income-amount" id="income-total">$0.00</p>
+                </div>
+                <div class="expense-box">
+                    <p class="box-title">Gastos</p>
+                    <p class="expense-amount" id="expense-total">$0.00</p>
                 </div>
             </div>
-            <!-- Aquí se mostrará el resumen mensual -->
-        </div>
-        
-        <div class="fab-container">
-            <div class="fab fab-income" id="add-income">
-                <span>+</span>
-            </div>
-            <div class="fab fab-expense" id="add-expense">
-                <span>-</span>
-            </div>
-        </div>
-        
-        <!-- Modal Ingreso -->
-        <div class="modal" id="income-modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title">Nuevo Ingreso</h3>
-                    <button class="close-modal" id="close-income-modal">&times;</button>
+            
+            <div class="transaction-list">
+                <h3 class="list-title">Historial de Transacciones</h3>
+            
+                <div id="transaction-container">
+                    <p class="no-transactions" id="no-transactions">No hay transacciones registradas</p>
                 </div>
-                <form id="income-form">
-                    <div class="form-group">
-                        <label for="income-descripcion">Descripción</label>
-                        <select name="descripcion" id="income-descripcion" required>
-                            <option value="Otros" selected>Otros</option>
-                            <option value="Salario">Salario</option>
-                            <option value="Inversiones">Inversiones</option>
-                            <option value="Regalo">Regalo</option>
-                            <option value="Freelance">Freelance</option>
-                        </select>
+                <button id="load-more-btn" class="load-more" style="display: none;">Ver más transacciones</button>
+            </div>
+            
+            <div id="resumen-mensual" style="background-color: var(--glass-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 14px; padding: 16px; margin-bottom: 80px; box-shadow: var(--glass-shadow);">
+                <div class="month-filter">
+                    <label for="month-select">Mes:</label>
+                    <select id="month-select"></select>
+                    <div class="month-nav">
+                        <button id="prev-month" class="month-nav-btn">&lt;</button>
+                        <button id="next-month" class="month-nav-btn">&gt;</button>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="income-fecha">Fecha</label>
-                        <input type="date" name="fecha" id="income-fecha" required>
+                </div>
+                <!-- Aquí se mostrará el resumen mensual -->
+            </div>
+            
+            <div class="fab-container">
+                <div class="fab fab-income" id="add-income">
+                    <span>+</span>
+                </div>
+                <div class="fab fab-expense" id="add-expense">
+                    <span>-</span>
+                </div>
+            </div>
+            
+            <!-- Modal Ingreso -->
+            <div class="modal" id="income-modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title">Nuevo Ingreso</h3>
+                        <button class="close-modal" id="close-income-modal">&times;</button>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="income-amount">Monto ($)</label>
-                        <input type="number" id="income-amount" class="no-virtual-keyboard" min="0.01" step="0.01" placeholder="0.00" required readonly>
-                        <div class="numeric-keyboard">
-                            <button type="button" class="keyboard-btn" data-value="1">1</button>
-                            <button type="button" class="keyboard-btn" data-value="2">2</button>
-                            <button type="button" class="keyboard-btn" data-value="3">3</button>
-                            <button type="button" class="keyboard-btn" data-value="4">4</button>
-                            <button type="button" class="keyboard-btn" data-value="5">5</button>
-                            <button type="button" class="keyboard-btn" data-value="6">6</button>
-                            <button type="button" class="keyboard-btn" data-value="7">7</button>
-                            <button type="button" class="keyboard-btn" data-value="8">8</button>
-                            <button type="button" class="keyboard-btn" data-value="9">9</button>
-                            <button type="button" class="keyboard-btn decimal" data-value=".">.</button>
-                            <button type="button" class="keyboard-btn zero" data-value="0">0</button>
-                            <button type="button" class="keyboard-btn backspace" data-action="backspace">⌫</button>
-                            <button type="button" class="keyboard-btn clear" data-action="clear">C</button>
+                    <form id="income-form">
+                        <div class="form-group">
+                            <label for="income-descripcion">Descripción</label>
+                            <select name="descripcion" id="income-descripcion" required>
+                                <option value="Otros" selected>Otros</option>
+                                <option value="Salario">Salario</option>
+                                <option value="Inversiones">Inversiones</option>
+                                <option value="Regalo">Regalo</option>
+                                <option value="Freelance">Freelance</option>
+                            </select>
                         </div>
-                    </div>
-                    <button type="submit" class="btn btn-income">Agregar Ingreso</button>
-                </form>
-            </div>
-        </div>
-        
-        <!-- Modal Gasto -->
-        <div class="modal" id="expense-modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title">Nuevo Gasto</h3>
-                    <button class="close-modal" id="close-expense-modal">&times;</button>
-                </div>
-                <form id="expense-form">
-                    <div class="form-group">
-                        <label for="expense-descripcion">Descripción</label>
-                        <select name="descripcion" id="expense-descripcion" required>
-                            <option value="Otros" selected>Otros</option>
-                            <option value="Comida">Comida</option>
-                            <option value="Transporte">Transporte</option>
-                            <option value="Entretenimiento">Entretenimiento</option>
-                            <option value="Servicios">Servicios</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="expense-fecha">Fecha</label>
-                        <input type="date" name="fecha" id="expense-fecha" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="expense-amount">Monto ($)</label>
-                        <input type="number" id="expense-amount" class="no-virtual-keyboard" min="0.01" step="0.01" placeholder="0.00" required readonly>
-                        <div class="numeric-keyboard">
-                            <button type="button" class="keyboard-btn" data-value="1">1</button>
-                            <button type="button" class="keyboard-btn" data-value="2">2</button>
-                            <button type="button" class="keyboard-btn" data-value="3">3</button>
-                            <button type="button" class="keyboard-btn" data-value="4">4</button>
-                            <button type="button" class="keyboard-btn" data-value="5">5</button>
-                            <button type="button" class="keyboard-btn" data-value="6">6</button>
-                            <button type="button" class="keyboard-btn" data-value="7">7</button>
-                            <button type="button" class="keyboard-btn" data-value="8">8</button>
-                            <button type="button" class="keyboard-btn" data-value="9">9</button>
-                            <button type="button" class="keyboard-btn decimal" data-value=".">.</button>
-                            <button type="button" class="keyboard-btn zero" data-value="0">0</button>
-                            <button type="button" class="keyboard-btn backspace" data-action="backspace">⌫</button>
-                            <button type="button" class="keyboard-btn clear" data-action="clear">C</button>
+                        
+                        <div class="form-group">
+                            <label for="income-fecha">Fecha</label>
+                            <input type="date" name="fecha" id="income-fecha" required>
                         </div>
-                    </div>
-                    <button type="submit" class="btn btn-expense">Agregar Gasto</button>
-                </form>
-            </div>
-        </div>
-        
-        <!-- Modal de Confirmación -->
-        <div class="confirm-modal" id="confirm-modal">
-            <div class="confirm-content">
-                <h3>¿Estás seguro?</h3>
-                <p>Esta acción eliminará la transacción permanentemente.</p>
-                <div class="confirm-buttons">
-                    <button class="confirm-btn yes" id="confirm-yes">Sí, eliminar</button>
-                    <button class="confirm-btn no" id="confirm-no">Cancelar</button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Modal de Edición -->
-        <div class="modal" id="edit-modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title">Editar Transacción</h3>
-                    <button class="close-modal" id="close-edit-modal">&times;</button>
-                </div>
-                <form id="edit-form">
-                    <div class="form-group">
-                        <label for="edit-descripcion">Descripción</label>
-                        <select name="descripcion" id="edit-descripcion" required>
-                            <option value="Otros">Otros</option>
-                            <option value="Salario">Salario</option>
-                            <option value="Inversiones">Inversiones</option>
-                            <option value="Regalo">Regalo</option>
-                            <option value="Freelance">Freelance</option>
-                            <option value="Comida">Comida</option>
-                            <option value="Transporte">Transporte</option>
-                            <option value="Entretenimiento">Entretenimiento</option>
-                            <option value="Servicios">Servicios</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="edit-fecha">Fecha</label>
-                        <input type="date" name="fecha" id="edit-fecha" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="edit-amount">Monto ($)</label>
-                        <input type="number" id="edit-amount" class="no-virtual-keyboard" min="0.01" step="0.01" required>
-                        <div class="numeric-keyboard">
-                            <button type="button" class="keyboard-btn" data-value="1">1</button>
-                            <button type="button" class="keyboard-btn" data-value="2">2</button>
-                            <button type="button" class="keyboard-btn" data-value="3">3</button>
-                            <button type="button" class="keyboard-btn" data-value="4">4</button>
-                            <button type="button" class="keyboard-btn" data-value="5">5</button>
-                            <button type="button" class="keyboard-btn" data-value="6">6</button>
-                            <button type="button" class="keyboard-btn" data-value="7">7</button>
-                            <button type="button" class="keyboard-btn" data-value="8">8</button>
-                            <button type="button" class="keyboard-btn" data-value="9">9</button>
-                            <button type="button" class="keyboard-btn decimal" data-value=".">.</button>
-                            <button type="button" class="keyboard-btn zero" data-value="0">0</button>
-                            <button type="button" class="keyboard-btn backspace" data-action="backspace">⌫</button>
-                            <button type="button" class="keyboard-btn clear" data-action="clear">C</button>
+                        
+                        <div class="form-group">
+                            <label for="income-amount">Monto ($)</label>
+                            <input type="number" id="income-amount" class="no-virtual-keyboard" min="0.01" step="0.01" placeholder="0.00" required readonly>
+                            <div class="numeric-keyboard">
+                                <button type="button" class="keyboard-btn" data-value="1">1</button>
+                                <button type="button" class="keyboard-btn" data-value="2">2</button>
+                                <button type="button" class="keyboard-btn" data-value="3">3</button>
+                                <button type="button" class="keyboard-btn" data-value="4">4</button>
+                                <button type="button" class="keyboard-btn" data-value="5">5</button>
+                                <button type="button" class="keyboard-btn" data-value="6">6</button>
+                                <button type="button" class="keyboard-btn" data-value="7">7</button>
+                                <button type="button" class="keyboard-btn" data-value="8">8</button>
+                                <button type="button" class="keyboard-btn" data-value="9">9</button>
+                                <button type="button" class="keyboard-btn decimal" data-value=".">.</button>
+                                <button type="button" class="keyboard-btn zero" data-value="0">0</button>
+                                <button type="button" class="keyboard-btn backspace" data-action="backspace">⌫</button>
+                                <button type="button" class="keyboard-btn clear" data-action="clear">C</button>
+                            </div>
                         </div>
+                        <button type="submit" class="btn btn-income">Agregar Ingreso</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Modal Gasto -->
+            <div class="modal" id="expense-modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title">Nuevo Gasto</h3>
+                        <button class="close-modal" id="close-expense-modal">&times;</button>
                     </div>
-                    <div class="form-group">
-                        <label for="edit-type">Tipo</label>
-                        <select id="edit-type" required>
-                            <option value="income">Ingreso</option>
-                            <option value="expense">Gasto</option>
-                        </select>
+                    <form id="expense-form">
+                        <div class="form-group">
+                            <label for="expense-descripcion">Descripción</label>
+                            <select name="descripcion" id="expense-descripcion" required>
+                                <option value="Otros" selected>Otros</option>
+                                <option value="Comida">Comida</option>
+                                <option value="Transporte">Transporte</option>
+                                <option value="Entretenimiento">Entretenimiento</option>
+                                <option value="Servicios">Servicios</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="expense-fecha">Fecha</label>
+                            <input type="date" name="fecha" id="expense-fecha" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="expense-amount">Monto ($)</label>
+                            <input type="number" id="expense-amount" class="no-virtual-keyboard" min="0.01" step="0.01" placeholder="0.00" required readonly>
+                            <div class="numeric-keyboard">
+                                <button type="button" class="keyboard-btn" data-value="1">1</button>
+                                <button type="button" class="keyboard-btn" data-value="2">2</button>
+                                <button type="button" class="keyboard-btn" data-value="3">3</button>
+                                <button type="button" class="keyboard-btn" data-value="4">4</button>
+                                <button type="button" class="keyboard-btn" data-value="5">5</button>
+                                <button type="button" class="keyboard-btn" data-value="6">6</button>
+                                <button type="button" class="keyboard-btn" data-value="7">7</button>
+                                <button type="button" class="keyboard-btn" data-value="8">8</button>
+                                <button type="button" class="keyboard-btn" data-value="9">9</button>
+                                <button type="button" class="keyboard-btn decimal" data-value=".">.</button>
+                                <button type="button" class="keyboard-btn zero" data-value="0">0</button>
+                                <button type="button" class="keyboard-btn backspace" data-action="backspace">⌫</button>
+                                <button type="button" class="keyboard-btn clear" data-action="clear">C</button>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-expense">Agregar Gasto</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Modal de Confirmación -->
+            <div class="confirm-modal" id="confirm-modal">
+                <div class="confirm-content">
+                    <h3>¿Estás seguro?</h3>
+                    <p>Esta acción eliminará la transacción permanentemente.</p>
+                    <div class="confirm-buttons">
+                        <button class="confirm-btn yes" id="confirm-yes">Sí, eliminar</button>
+                        <button class="confirm-btn no" id="confirm-no">Cancelar</button>
                     </div>
-                    <button type="submit" class="btn" id="edit-submit-btn">Guardar Cambios</button>
-                </form>
+                </div>
+            </div>
+            
+            <!-- Modal de Edición -->
+            <div class="modal" id="edit-modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title">Editar Transacción</h3>
+                        <button class="close-modal" id="close-edit-modal">&times;</button>
+                    </div>
+                    <form id="edit-form">
+                        <div class="form-group">
+                            <label for="edit-descripcion">Descripción</label>
+                            <select name="descripcion" id="edit-descripcion" required>
+                                <option value="Otros">Otros</option>
+                                <option value="Salario">Salario</option>
+                                <option value="Inversiones">Inversiones</option>
+                                <option value="Regalo">Regalo</option>
+                                <option value="Freelance">Freelance</option>
+                                <option value="Comida">Comida</option>
+                                <option value="Transporte">Transporte</option>
+                                <option value="Entretenimiento">Entretenimiento</option>
+                                <option value="Servicios">Servicios</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="edit-fecha">Fecha</label>
+                            <input type="date" name="fecha" id="edit-fecha" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="edit-amount">Monto ($)</label>
+                            <input type="number" id="edit-amount" class="no-virtual-keyboard" min="0.01" step="0.01" required>
+                            <div class="numeric-keyboard">
+                                <button type="button" class="keyboard-btn" data-value="1">1</button>
+                                <button type="button" class="keyboard-btn" data-value="2">2</button>
+                                <button type="button" class="keyboard-btn" data-value="3">3</button>
+                                <button type="button" class="keyboard-btn" data-value="4">4</button>
+                                <button type="button" class="keyboard-btn" data-value="5">5</button>
+                                <button type="button" class="keyboard-btn" data-value="6">6</button>
+                                <button type="button" class="keyboard-btn" data-value="7">7</button>
+                                <button type="button" class="keyboard-btn" data-value="8">8</button>
+                                <button type="button" class="keyboard-btn" data-value="9">9</button>
+                                <button type="button" class="keyboard-btn decimal" data-value=".">.</button>
+                                <button type="button" class="keyboard-btn zero" data-value="0">0</button>
+                                <button type="button" class="keyboard-btn backspace" data-action="backspace">⌫</button>
+                                <button type="button" class="keyboard-btn clear" data-action="clear">C</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-type">Tipo</label>
+                            <select id="edit-type" required>
+                                <option value="income">Ingreso</option>
+                                <option value="expense">Gasto</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn" id="edit-submit-btn">Guardar Cambios</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
     
     <script>
         // Elementos del DOM
+        const authScreen = document.getElementById('auth-screen');
+        const mainScreen = document.getElementById('main-screen');
+        const loginContainer = document.getElementById('login-container');
+        const registerContainer = document.getElementById('register-container');
+        const showRegister = document.getElementById('show-register');
+        const showLogin = document.getElementById('show-login');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const logoutBtn = document.getElementById('logout-btn');
+        
         const balanceEl = document.getElementById('balance');
         const incomeTotalEl = document.getElementById('income-total');
         const expenseTotalEl = document.getElementById('expense-total');
         const transactionContainer = document.getElementById('transaction-container');
         const noTransactionsEl = document.getElementById('no-transactions');
+        const loadMoreBtn = document.getElementById('load-more-btn');
         const monthSelect = document.getElementById('month-select');
         const prevMonthBtn = document.getElementById('prev-month');
         const nextMonthBtn = document.getElementById('next-month');
@@ -1072,11 +1243,13 @@
         const editAmountInput = document.getElementById('edit-amount');
         
         // Variables de estado
-        let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+        let currentUser = null;
+        let transactions = [];
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
         let transactionToDelete = null;
         let transactionToEdit = null;
+        let transactionsToShow = 5; // Mostrar solo 5 transacciones inicialmente
         
         // Nombres de los meses
         const monthNames = [
@@ -1084,7 +1257,107 @@
             "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
         ];
         
-        // Funciones
+        // Funciones de autenticación
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+        
+        function clearErrors() {
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.textContent = '';
+                el.style.display = 'none';
+            });
+        }
+        
+        function registerUser(name, email, password) {
+            // Obtener usuarios existentes
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            
+            // Verificar si el usuario ya existe
+            if (users.some(user => user.email === email)) {
+                showError('register-email-error', 'Este correo ya está registrado');
+                return false;
+            }
+            
+            // Verificar que las contraseñas coincidan
+            const confirmPassword = document.getElementById('register-confirm').value;
+            if (password !== confirmPassword) {
+                showError('register-confirm-error', 'Las contraseñas no coinciden');
+                return false;
+            }
+            
+            // Crear nuevo usuario
+            const newUser = {
+                id: Date.now().toString(),
+                name,
+                email,
+                password // En una aplicación real, esto debería estar encriptado
+            };
+            
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            return true;
+        }
+        
+        function loginUser(email, password) {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (!user) {
+                showError('login-password-error', 'Correo o contraseña incorrectos');
+                return false;
+            }
+            
+            return user;
+        }
+        
+        function checkAuth() {
+            const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+            
+            if (loggedInUser) {
+                currentUser = loggedInUser;
+                loadUserData();
+                showMainScreen();
+            } else {
+                showAuthScreen();
+            }
+        }
+        
+        function loadUserData() {
+            if (!currentUser) return;
+            
+            const userData = JSON.parse(localStorage.getItem(`userData_${currentUser.id}`)) || {};
+            transactions = userData.transactions || [];
+        }
+        
+        function saveUserData() {
+            if (!currentUser) return;
+            
+            const userData = {
+                transactions
+            };
+            
+            localStorage.setItem(`userData_${currentUser.id}`, JSON.stringify(userData));
+        }
+        
+        function showAuthScreen() {
+            authScreen.style.display = 'block';
+            mainScreen.style.display = 'none';
+            loginContainer.style.display = 'block';
+            registerContainer.style.display = 'none';
+            clearErrors();
+        }
+        
+        function showMainScreen() {
+            authScreen.style.display = 'none';
+            mainScreen.style.display = 'block';
+            updateUI();
+        }
+        
+        // Funciones de la aplicación
         function formatMoney(amount) {
             const absAmount = Math.abs(parseFloat(amount) || 0);
             const formattedAmount = new Intl.NumberFormat('es-ES', {
@@ -1253,13 +1526,14 @@
                 noTransactionsEl.style.display = 'block';
                 transactionContainer.innerHTML = '';
                 transactionContainer.appendChild(noTransactionsEl);
+                loadMoreBtn.style.display = 'none';
             }
             
             // Actualizar el resumen mensual
             updateMonthlySummary();
             
-            // Guardar en localStorage
-            localStorage.setItem('transactions', JSON.stringify(transactions));
+            // Guardar datos del usuario
+            saveUserData();
         }
     
         function renderTransactionList() {
@@ -1269,7 +1543,17 @@
             // Ordenar transacciones por fecha (más recientes primero)
             const sortedTransactions = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
             
-            sortedTransactions.forEach(transaction => {
+            // Mostrar solo las primeras N transacciones
+            const transactionsToDisplay = sortedTransactions.slice(0, transactionsToShow);
+            
+            if (transactionsToDisplay.length === 0) {
+                noTransactionsEl.style.display = 'block';
+                transactionContainer.appendChild(noTransactionsEl);
+                loadMoreBtn.style.display = 'none';
+                return;
+            }
+            
+            transactionsToDisplay.forEach(transaction => {
                 const transactionEl = document.createElement('div');
                 transactionEl.classList.add('transaction');
                 transactionEl.classList.add(transaction.type);
@@ -1324,6 +1608,13 @@
                     actionMenu.style.display = 'none';
                 });
             });
+            
+            // Mostrar u ocultar el botón "Ver más"
+            if (sortedTransactions.length > transactionsToShow) {
+                loadMoreBtn.style.display = 'block';
+            } else {
+                loadMoreBtn.style.display = 'none';
+            }
             
             // Cerrar menús al hacer clic fuera
             document.addEventListener('click', () => {
@@ -1403,6 +1694,79 @@
         }
         
         // Event Listeners
+        showRegister.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginContainer.style.display = 'none';
+            registerContainer.style.display = 'block';
+            clearErrors();
+        });
+        
+        showLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginContainer.style.display = 'block';
+            registerContainer.style.display = 'none';
+            clearErrors();
+        });
+        
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            clearErrors();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (!email || !password) {
+                showError('login-password-error', 'Por favor completa todos los campos');
+                return;
+            }
+            
+            const user = loginUser(email, password);
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('loggedInUser', JSON.stringify(user));
+                loadUserData();
+                showMainScreen();
+            }
+        });
+        
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            clearErrors();
+            
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            
+            if (!name || !email || !password) {
+                showError('register-name-error', 'Por favor completa todos los campos');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showError('register-password-error', 'La contraseña debe tener al menos 6 caracteres');
+                return;
+            }
+            
+            if (registerUser(name, email, password)) {
+                alert('Registro exitoso. Por favor inicia sesión.');
+                loginContainer.style.display = 'block';
+                registerContainer.style.display = 'none';
+                clearErrors();
+            }
+        });
+        
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('loggedInUser');
+            currentUser = null;
+            transactions = [];
+            showAuthScreen();
+        });
+        
+        loadMoreBtn.addEventListener('click', () => {
+            transactionsToShow += 5; // Mostrar 5 transacciones más
+            renderTransactionList();
+        });
+        
         addIncomeBtn.addEventListener('click', () => {
             incomeModal.style.display = 'flex';
             document.getElementById('income-fecha').value = new Date().toISOString().split('T')[0];
@@ -1512,9 +1876,9 @@
             updateMonthlySummary();
         });
         
-        // Inicializar UI
+        // Inicializar la aplicación
+        checkAuth();
         setupMonthFilter();
-        updateUI();
     </script>
 </body>
 </html>
